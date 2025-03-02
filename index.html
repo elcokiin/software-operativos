@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+    <link rel="stylesheet" href="style.css">
+    <title>Software1</title>
+  </head>
+  <body>
+    <header class="header">
+        <h1>SOFTWARE 1</h1>
+        <ul>
+            <li>Manual de usuario</li>
+        </ul>
+    </header>
+
+    <main class="main">
+        <section class="new-process">
+            <form class="form-new-process">
+                <div class="title-new-process">
+                    <h2>Agregar nuevo proceso</h2>
+                </div>
+                <label for="pid">
+                    Nombre del proceso:
+                    <input 
+                        type="text" 
+                        id="pid" 
+                        name="pid" 
+                        class="input name-process" 
+                        required
+                        placeholder="PID"
+                    >
+                </label>
+                <label for="time">
+                    Tiempo de ejecución:
+                    <input 
+                        type="number" 
+                        id="time" 
+                        name="time" 
+                        class="input time-process" 
+                        required
+                        placeholder="5"
+                    >
+                </label>
+                <label for="blocked-process">
+                    ¿Está bloqueado el proceso?
+                    <select id="blocked" name="blocked" class="input blocked-process" required>
+                        <option value="no">No</option>
+                        <option value="yes">Sí</option>
+                    </select>
+                </label>
+
+                <button type="button" id="add-process" class="button-submit">Agregar proceso</button>
+            </form>
+            <!-- tabla -->
+            <div class="table-container">
+                <div class="grid-table">
+                    <div class="grid-header">
+                        <div class="grid-cell header-cell">PID</div>
+                        <div class="grid-cell header-cell">Tiempo de ejecución</div>
+                        <div class="grid-cell header-cell">Bloqueado</div>
+                        <div class="grid-cell header-cell">Acciones</div>
+                    </div>
+                    <div class="grid-body">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="execute-process">
+            <button class="button-submit success-button" id="execute-process">
+                Ejecutar Procesos
+            </button>
+        </div>
+
+        <section class="process-list">
+            <!-- buscador y filtro -->
+            <div class="search-process">
+                <div class="search-container">
+                    <input 
+                        type="text" 
+                        id="search-pid" 
+                        name="search" 
+                        class="input search-process" 
+                        placeholder="PID"
+                    >
+                    <button type="button" id="search-process" class="button-submit">Buscar</button>
+                </div>
+
+                <ul class="list-filter-process">
+                    <li class="filter-process active" id="all">
+                        General
+                    </li>
+                    <li class="filter-process" id="ready">
+                        Listo
+                    </li>
+                    <li class="filter-process" id="running">
+                        En ejecución
+                    </li>
+                    <li class="filter-process" id="blocked">
+                        Bloquear
+                    </li>
+                    <li class="filter-process" id="finished">
+                        Salida
+                    </li>
+                </ul>
+            </div>
+            <!-- tabla -->
+            <div class="table-container" id="process-table-container"></div>
+                <div class="grid-table" id="process-grid-table">
+                    <div class="grid-header" id="process-grid-header">
+                        <div class="grid-cell header-cell">PID</div>
+                        <div class="grid-cell header-cell">Tiempo restante</div>
+                        <div class="grid-cell header-cell">Estado / Transición</div>
+                    </div>
+                    <div class="grid-body" id="process-grid-body"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p><span class="bold">Universidad Pedagógica y Tecnológica de Colombia</span></p>
+        <p>‎</p>
+        <p>Desarrollado por: <span class="bold">Diego Aguirre</span></p>
+        <p>Profesor a cargo: <span class="bold">Juan José Camargo</span></p>
+        <p>Asignatura: <span class="bold">Sistemas Operativos</span></p>
+    </footer>
+
+    <div class="container-button-close">
+        <button id="closeApp" class="close-button">Cerrar programa</button>
+    </div>
+    
+    <script src="src/index.js" type="module"></script>
+  </body>
+</html>
