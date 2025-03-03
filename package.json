@@ -25,6 +25,7 @@
     "electron": "^34.3.0"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1"
+    "electron-squirrel-startup": "^1.0.1",
+    "pspdfkit": "^2024.8.2"
   }
 }

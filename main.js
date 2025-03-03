@@ -46,8 +46,20 @@ const createWindow = () => {
     // Devuelve true si el usuario seleccionó "Sí" (índice 0)
     return response.response === 0;
   });
-
 }
+
+ipcMain.on('user-manual', () => {
+  const win = new BrowserWindow({
+    width: 400,
+    height: 600,
+    autoHideMenuBar: true,
+    webPreferences: {
+        preload: path.join(__dirname, 'preload.js')
+    }
+  })
+
+  win.loadFile('user-manual.html')
+})
 
 app.whenReady().then(() => {
   createWindow()

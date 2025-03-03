@@ -40,6 +40,11 @@ export const addProcess = ({ pid, time, block }) => {
     
     listOfProcesses.push({ pid, time, block });
 }
+
+export const resetHistory = () => {
+    historyProcesses = [];
+}
+
 export const executeProcess = (process) => {
     // Create a copy of the original process
     const processCopy = { ...process };

@@ -1,5 +1,9 @@
 import { $, $$, generateTableProcess, generateTableExecProcess } from "./utils.js"
-import { listOfProcesses, addProcess, historyProcesses, executeProcess } from "./process.js"
+import { listOfProcesses, addProcess, historyProcesses, executeProcess, resetHistory } from "./process.js"
+
+$("#user-manual").addEventListener("click", () => {
+    window.electronAPI.userManual()
+})
 
 $("#closeApp").addEventListener("click", async () => {
     if (await window.electronAPI.showConfirmDialog("¿Estás seguro que deseas cerrar la aplicación?")) {
@@ -17,6 +21,8 @@ $("#add-process").addEventListener("click", () => {
 })
 
 $("#execute-process").addEventListener("click", () => {
+    resetHistory()
+
     listOfProcesses.forEach(process => {
         executeProcess(process);
     })
