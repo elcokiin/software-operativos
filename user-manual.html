@@ -3,56 +3,47 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+			http-equiv="Content-Security-Policy"
+			content="default-src 'self'; script-src 'self' 'nonce-abc123';"
 		/>
-		<title>PSPDFKit for Electron Example App</title>
-
-		<style>
-			html,
-			body {
-				margin: 0;
-				padding: 0;
-				background: #f6f7fa;
-			}
-
-			header {
-				display: none;
-			}
-
-			#root {
-				width: 100vw;
-				height: 100vh;
-			}
-		</style>
+		<title>Electron PDF.js Desktop PDF Viewer Example</title>
 	</head>
-
 	<body>
-		<header></header>
-		<div id="root"></div>
+		<h1>Manual de usuario creado por Diego Aguirre.</h1>
+		<canvas id="pdfContainer"></canvas>
 
-		<script src="./public/pspdfkit.js"></script>
+		<!-- Import PDF.js as a module -->
+		<script type="module" nonce="abc123">
+			import * as pdfjsLib from './pdf.min.mjs';
 
-		<script type="module">
-			let instance = null;
+			// Set the workerSrc to point to the PDF.js worker script
+			pdfjsLib.GlobalWorkerOptions.workerSrc =
+				'./pdf.worker.min.mjs';
 
-			async function load(document) {
-				if (instance) {
-					PSPDFKit.unload(instance);
-					hasUnsavedAnnotations = false;
-					instance = null;
+			async function renderPdf(pdfDocument) {
+				try {
+					const pdf = await pdfjsLib.getDocument(pdfDocument)
+						.promise;
+					const pageNumber = 1;
+					const page = await pdf.getPage(pageNumber);
+					const scale = 1.5;
+					const viewport = page.getViewport({ scale });
+					const canvas = document.getElementById('pdfContainer');
+					const context = canvas.getContext('2d');
+					canvas.height = viewport.height;
+					canvas.width = viewport.width;
+					const renderContext = {
+						canvasContext: context,
+						viewport,
+					};
+					page.render(renderContext);
+				} catch (error) {
+					console.error(error);
 				}
-
-				const configuration = {
-					document,
-					container: '#root',
-					appName: 'software 1',
-				};
-
-				instance = await PSPDFKit.load(configuration);
 			}
 
-			window.onload = () => load('./manual-de-usuario-software-1.pdf');
+			const pdfPath = './manual-de-usuario-software-1.pdf'; // Path to your PDF file
+			renderPdf(pdfPath);
 		</script>
 	</body>
 </html>
