@@ -50,8 +50,8 @@ const createWindow = () => {
 
 ipcMain.on('user-manual', () => {
   const win = new BrowserWindow({
-    width: 400,
-    height: 600,
+    width: 1000,
+    height: 800,
     autoHideMenuBar: true,
     webPreferences: {
         preload: path.join(__dirname, 'preload.js')

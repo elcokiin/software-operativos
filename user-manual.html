@@ -1,49 +1,64 @@
+1/user-manual.html -->
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="UTF-8" />
-		<meta
-			http-equiv="Content-Security-Policy"
-			content="default-src 'self'; script-src 'self' 'nonce-abc123';"
-		/>
-		<title>Electron PDF.js Desktop PDF Viewer Example</title>
-	</head>
-	<body>
-		<h1>Manual de usuario creado por Diego Aguirre.</h1>
-		<canvas id="pdfContainer"></canvas>
+    <head>
+        <meta charset="UTF-8" />
+        <meta
+            http-equiv="Content-Security-Policy"
+            content="default-src 'self'; script-src 'self' 'nonce-abc123';"
+        />
+        <title>Electron PDF.js Desktop PDF Viewer Example</title>
+        <style nonce="abc123">
+            .pdf-page {
+                margin-bottom: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="pdfContainer"></div>
 
-		<!-- Import PDF.js as a module -->
-		<script type="module" nonce="abc123">
-			import * as pdfjsLib from './pdf.min.mjs';
+        <!-- Import PDF.js as a module -->
+        <script type="module" nonce="abc123">
+            import * as pdfjsLib from './pdf.min.mjs';
 
-			// Set the workerSrc to point to the PDF.js worker script
-			pdfjsLib.GlobalWorkerOptions.workerSrc =
-				'./pdf.worker.min.mjs';
+            // Set the workerSrc to point to the PDF.js worker script
+            pdfjsLib.GlobalWorkerOptions.workerSrc =
+                './pdf.worker.min.mjs';
 
-			async function renderPdf(pdfDocument) {
-				try {
-					const pdf = await pdfjsLib.getDocument(pdfDocument)
-						.promise;
-					const pageNumber = 1;
-					const page = await pdf.getPage(pageNumber);
-					const scale = 1.5;
-					const viewport = page.getViewport({ scale });
-					const canvas = document.getElementById('pdfContainer');
-					const context = canvas.getContext('2d');
-					canvas.height = viewport.height;
-					canvas.width = viewport.width;
-					const renderContext = {
-						canvasContext: context,
-						viewport,
-					};
-					page.render(renderContext);
-				} catch (error) {
-					console.error(error);
-				}
-			}
+            async function renderPdf(pdfDocument) {
+                try {
+                    const pdf = await pdfjsLib.getDocument(pdfDocument).promise;
+                    const totalPages = pdf.numPages;
+                    const container = document.getElementById('pdfContainer');
+                    
+                    // Render all pages
+                    for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+                        const page = await pdf.getPage(pageNumber);
+                        const scale = 1.5;
+                        const viewport = page.getViewport({ scale });
+                        
+                        // Create a canvas for each page
+                        const canvas = document.createElement('canvas');
+                        canvas.className = 'pdf-page';
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+                        container.appendChild(canvas);
+                        
+                        const context = canvas.getContext('2d');
+                        const renderContext = {
+                            canvasContext: context,
+                            viewport,
+                        };
+                        
+                        await page.render(renderContext).promise;
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
 
-			const pdfPath = './manual-de-usuario-software-1.pdf'; // Path to your PDF file
-			renderPdf(pdfPath);
-		</script>
-	</body>
+            const pdfPath = './manual-de-usuario-software-1.pdf'; // Path to your PDF file
+            renderPdf(pdfPath);
+        </script>
+    </body>
 </html>
