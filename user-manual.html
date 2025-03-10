@@ -8,15 +8,16 @@
             content="default-src 'self'; script-src 'self' 'nonce-abc123';"
         />
         <title>Electron PDF.js Desktop PDF Viewer Example</title>
-        <style nonce="abc123">
-            .pdf-page {
-                margin-bottom: 20px;
-            }
-        </style>
+        <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div id="pdfContainer"></div>
+            <div id="pdfContainer"></div>
 
+        <div class="container-button-close">
+            <button id="closeManual" class="close-button">Cerrar Manual de Usuario</button>
+        </div>
+
+        <script type="module" src="./src/user-manual.js"></script>
         <!-- Import PDF.js as a module -->
         <script type="module" nonce="abc123">
             import * as pdfjsLib from './pdf.min.mjs';
