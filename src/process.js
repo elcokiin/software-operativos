@@ -11,7 +11,7 @@ export const popProcess = () => {
     listOfProcesses = listOfProcesses.filter(process => process !== undefined);
 }
 
-export const addProcess = ({ pid, time, block, priority, changePriority, suspend, reanudar, destruir }) => {
+export const addProcess = ({ pid, time, block, readySuspend, blockSuspend, reanudar }) => {
     // Convert time to integer if it's a string
     try {
         if (typeof time === 'string') {
@@ -20,33 +20,24 @@ export const addProcess = ({ pid, time, block, priority, changePriority, suspend
                 window.electronAPI.showErrorDialog('El tiempo de ejecución debe ser un número entero');
                 return 0;
             }
-            if(isNaN(priority)) {
-                window.electronAPI.showErrorDialog('La prioridad debe ser un número entero');
-                return 0;
-            }
         }
     } catch (error) {
         window.electronAPI.showErrorDialog('Error al procesar el tiempo de ejecución');
         return 0;
     }
 
-    if (reanudar === "yes" && suspend === "no") {
+    if (block === "no" && blockSuspend === "yes") {
+        window.electronAPI.showErrorDialog("Error el proceso debe estar bloqueado para poder ser suspendido bloqueado.")
+        return 0;
+    }
+
+    if (block === "yes" && readySuspend === "yes") {
+        window.electronAPI.showErrorDialog("Error el proceso no puede estar bloqueado y suspendido listo.")
+        return 0;
+    }
+
+    if (reanudar === "yes" && (readySuspend === "no" && blockSuspend === "no")) {
         window.electronAPI.showErrorDialog("Error el proceso no puede reanudarse si no esta suspendido.")
-        return 0;
-    }
-
-    if (priority <= 0) {
-        window.electronAPI.showErrorDialog('La prioridad debe ser mayor que 0');
-        return 0;
-    }
-
-    if (changePriority <= 0 && changePriority) {
-        window.electronAPI.showErrorDialog('El cambio de prioridad debe ser mayor que 0');
-        return 0;
-    }
-
-    if (priority === changePriority) {
-        window.electronAPI.showErrorDialog('La prioridad y el cambio de prioridad no pueden ser iguales');
         return 0;
     }
 
@@ -55,8 +46,7 @@ export const addProcess = ({ pid, time, block, priority, changePriority, suspend
         return 0;
     }
 
-    if (!pid || time === undefined || block === undefined || suspend === undefined || 
-        priority === undefined || reanudar === undefined || destruir === undefined) {
+    if (!pid || time === undefined || block === undefined || blockSuspend === undefined || reanudar === undefined || readySuspend === undefined) {
         window.electronAPI.showErrorDialog('Por favor, llena todos los campos');
         return 0;
     }
@@ -72,7 +62,7 @@ export const addProcess = ({ pid, time, block, priority, changePriority, suspend
 
     if (pidExists) return 0;
     
-    listOfProcesses.push({ pid, time, block, priority, changePriority, suspend, reanudar, destruir, });
+    listOfProcesses.push({ pid, time, block, blockSuspend, readySuspend, reanudar,  });
     return 1;
 }
 

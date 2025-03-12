@@ -12,11 +12,11 @@
       content="default-src 'self'; script-src 'self'"
     />
     <link rel="stylesheet" href="style.css">
-    <title>Software2</title>
+    <title>Software3</title>
   </head>
   <body>
     <header class="header">
-        <h1>SOFTWARE 2</h1>
+        <h1>SOFTWARE 3</h1>
         <ul>
             <li id="user-manual">Manual de usuario</li>
         </ul>
@@ -48,27 +48,6 @@
                         required
                     >
                 </label>
-                <label class="form-label-process" for="priority">
-                    Prioridad del proceso:
-                    <input 
-                        type="number" 
-                        id="priority" 
-                        name="priority"
-                        class="input time-process" 
-                        required
-                    >
-                </label>
-
-                <label class="form-label-process" for="priority">
-                    Cambio de prioridad:
-                    <input 
-                        type="number" 
-                        id="change-priority" 
-                        name="change-priority"
-                        class="input time-process" 
-                        required
-                    >
-                </label>
 
                 <div class="checkbox-processes">
                     <label class="form-label-process" for="blocked-process">
@@ -80,24 +59,24 @@
                     </label>
     
                     <label class="form-label-process" for="suspend-process">
-                        ¿Suspendido?
-                        <select id="suspend" name="suspend" class="input suspend-process" required>
+                        ¿Suspendido Listo?
+                        <select id="ready-suspend" name="ready-suspend" class="input suspend-process" required>
                             <option value="no">No</option>
                             <option value="yes">Sí</option>
                         </select>
                     </label>
                     
-                    <label class="form-label-process" for="reanudar-process">
-                        ¿Reanudado?
-                        <select id="reanudar" name="reanudar" class="input reanudar-process" required>
+                    <label class="form-label-process" for="suspend-process">
+                        ¿Suspendido Bloqueado?
+                        <select id="block-suspend" name="block-suspend" class="input suspend-process" required>
                             <option value="no">No</option>
                             <option value="yes">Sí</option>
                         </select>
                     </label>
 
-                    <label class="form-label-process" for="destruir-process">
-                        ¿Destruido?
-                        <select id="destruir" name="destruir" class="input destruir-process" required>
+                    <label class="form-label-process" for="reanudar-process">
+                        ¿Reanudado?
+                        <select id="reanudar" name="reanudar" class="input reanudar-process" required>
                             <option value="no">No</option>
                             <option value="yes">Sí</option>
                         </select>
@@ -114,11 +93,10 @@
                     <div class="grid-header">
                         <div class="grid-cell header-cell">Proceso</div>
                         <div class="grid-cell header-cell">Tiempo ejecución</div>
-                        <div class="grid-cell header-cell">Prioridad</div>
                         <div class="grid-cell header-cell">Bloqueado</div>
-                        <div class="grid-cell header-cell">Suspendido</div>
+                        <div class="grid-cell header-cell">Suspendido Listo</div>
+                        <div class="grid-cell header-cell">Suspendido Bloqueado</div>
                         <div class="grid-cell header-cell">Reanudado</div>
-                        <div class="grid-cell header-cell">Destruido</div>
                         <div class="grid-cell header-cell">Acciones</div>
                     </div>
                     <div class="grid-body">
@@ -175,24 +153,23 @@
                         Bloqueados
                     </li>
                     <li class="filter-process" id="despertar">
-                        Despertados
+                        Terminación de operación
                     </li>
 
-                    <li class="filter-process" id="suspendido">
-                        Suspendidos
+                    <li class="filter-process" id="wait-event">
+                        Espera de evento
+                    </li>
+
+                    <li class="filter-process" id="suspendido-listo">
+                        Suspendido Listo
+                    </li>
+
+                    <li class="filter-process" id="suspendido-bloqueado">
+                        Suspendido Bloqueado
                     </li>
 
                     <li class="filter-process" id="reanudado">
                         Reanudados
-                    </li>
-
-                    <li class="filter-process" id="destruidos">
-                        Destruidos
-                    </li>
-                    
-                    <li class="filter-process" id="cambio-prioridad">
-                        Cambios de Prioridad
-                        <!-- pid | prioridad anterior | nueva prioridad -->
                     </li>
                     
                     <li class="filter-process" id="finished">
@@ -208,11 +185,10 @@
                     <div class="grid-header" id="process-grid-header">
                         <div class="grid-cell header-cell">Nombre del proceso</div>
                         <div class="grid-cell header-cell">Tiempo restante</div>
-                        <div class="grid-cell header-cell">Prioridad</div>
                         <div class="grid-cell header-cell">Bloqueado</div>
-                        <div class="grid-cell header-cell">Suspendido</div>
+                        <div class="grid-cell header-cell">Suspendido Listo</div>
+                        <div class="grid-cell header-cell">Suspendido Bloqueado</div>
                         <div class="grid-cell header-cell">Reanudado</div>
-                        <div class="grid-cell header-cell">Destruido</div>
                         <div class="grid-cell header-cell">Estado</div>
                     </div>
                     <div class="grid-body" id="process-grid-body"></div>

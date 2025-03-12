@@ -1,6 +1,6 @@
 {
-  "name": "entrega2",
-  "version": "2.0.0",
+  "name": "entrega3",
+  "version": "3.0.0",
   "main": "main.js",
   "scripts": {
     "dev": "electron .",

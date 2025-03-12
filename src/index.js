@@ -14,14 +14,12 @@ $("#closeApp").addEventListener("click", async () => {
 $("#add-process").addEventListener("click", () => {
     const pid = $("#pid").value
     const time = $("#time").value
-    const priority = $("#priority").value
-    const changePriority = $("#change-priority").value
     const block = $("#blocked").value
-    const suspend = $("#suspend").value
+    const readySuspend = $("#ready-suspend").value
+    const blockSuspend = $("#block-suspend").value
     const reanudar = $("#reanudar").value
-    const destruir = $("#destruir").value
 
-    const isSuccess = addProcess({ pid, time, block, priority, changePriority, suspend, reanudar, destruir })
+    const isSuccess = addProcess({ pid, time, block, readySuspend, blockSuspend, reanudar })
     generateTableProcess(listOfProcesses)
 
     console.log(listOfProcesses)
@@ -29,8 +27,10 @@ $("#add-process").addEventListener("click", () => {
     if (isSuccess) {
         $('#pid').value = ""
         $("#time").value = ""
-        $("#priority").value = ""
-        $("#change-priority").value = ""
+        $("#blocked").value = "no"
+        $("#ready-suspend").value = "no"
+        $("#block-suspend").value = "no"
+        $("#reanudar").value = "no"
     }
 })
 $("#execute-process").addEventListener("click", () => {
@@ -45,45 +45,24 @@ $("#execute-process").addEventListener("click", () => {
     listOfProcesses.forEach(process => {
         historyProcesses.push({
             ...process,
-            status: 'inicializado'
+            status: 'nuevo'
         });
     })
 
-    // Sort processes by priority (1 is highest priority)
-    listOfProcesses.sort((a, b) => parseInt(a.priority) - parseInt(b.priority));
-    
-    // Group processes by priority
-    const processesByPriority = {};
-    listOfProcesses.forEach(process => {
-        const priority = process.priority;
-        if (!processesByPriority[priority]) {
-            processesByPriority[priority] = [];
-        }
-        processesByPriority[priority].push({...process});
-    });
+    // Create a queue with copies of all processes
+    const processQueue = listOfProcesses.map(process => ({...process}));
     
     // Clear original list since we have copies
     resetListProcess();
     
     const EXECTIME = 5;
-    let priorities = Object.keys(processesByPriority).sort((a, b) => parseInt(a) - parseInt(b));
     
-    // Continue processing until all priorities are empty
-    while (priorities.length > 0) {
-        // Get the current lowest priority
-        const priority = priorities[0];
-        let processes = processesByPriority[priority];
+    // Continue processing until all processes are done
+    while (processQueue.length > 0) {
+        // Get the next process from the queue
+        const process = processQueue.shift();
         
-        if (processes.length === 0) {
-            // Remove this priority if empty
-            priorities.shift();
-            continue;
-        }
-        
-        // Process the next item in the current priority
-        const process = processes.shift();
-        
-        // Store complete process information in history
+        // Store process states in history
         historyProcesses.push({
             ...process,
             status: 'listo'
@@ -99,19 +78,9 @@ $("#execute-process").addEventListener("click", () => {
             status: 'ejecución'
         });
         
-        // Modify the copy, not the original
+        // Process execution - reduce time
         const updatedProcess = {...process, time: parseInt(process.time) - EXECTIME};
         
-        // Check if process is to be destroyed
-        if(updatedProcess.destruir === 'yes') {
-            if(updatedProcess.time <= 0) updatedProcess.time = 0;
-            historyProcesses.push({
-                ...updatedProcess,
-                status: 'destruido'
-            });
-            continue;
-        }
-
         // Check if process is finished
         if(updatedProcess.time <= 0) {
             updatedProcess.time = 0;
@@ -124,65 +93,64 @@ $("#execute-process").addEventListener("click", () => {
 
         let currentProcess = {...updatedProcess};
         
-        if(currentProcess.changePriority && updatedProcess.priority !== currentProcess.changePriority) {
-            const newPriority = currentProcess.changePriority;
+        // Handle ready suspend
+        if(currentProcess.readySuspend === 'yes') {
             historyProcesses.push({
                 ...currentProcess,
-                priority: newPriority,
-                status: 'cambio de prioridad'
+                status: 'suspendido listo'
             });
             
-            // Add to new priority queue
-            if (!processesByPriority[newPriority]) {
-                processesByPriority[newPriority] = [];
-                // Update the priorities array
-                priorities = [...priorities, newPriority];
-                priorities.sort((a, b) => parseInt(a) - parseInt(b));
-            }
-            
-            // Update current process with new priority and add to appropriate queue
-            currentProcess = {
-                ...currentProcess,
-                priority: newPriority
-            };
-            
-            processesByPriority[newPriority].push(currentProcess);
-            // continue;
-        }
-        
-        // Check if process is suspended
-        if(currentProcess.suspend === 'yes') {
-            historyProcesses.push({
-                ...currentProcess,
-                status: 'suspendido'
-            });
-            
-            // If also marked to resume
+            // If marked to resume
             if(currentProcess.reanudar === 'yes') {
                 historyProcesses.push({
                     ...currentProcess,
                     status: 'reanudado'
                 });
-                processesByPriority[currentProcess.priority].push({...currentProcess, suspend: 'no'});
-            } else {
-                processesByPriority[currentProcess.priority].push({...currentProcess});
             }
-            
+            processQueue.push({...currentProcess});
             continue;
         }
         
+        // Handle block
         if(currentProcess.block === 'yes') {
+
+            historyProcesses.push({
+                ...currentProcess,
+                status: "espera de evento",
+            })
+
             historyProcesses.push({
                 ...currentProcess,
                 status: 'bloquear'
             });
             
+            // Handle block suspend
+            if(currentProcess.blockSuspend === 'yes') {
+                historyProcesses.push({
+                    ...currentProcess,
+                    status: 'suspendido bloqueado'
+                });
+                
+                // If marked to resume
+                if(currentProcess.reanudar === 'yes') {
+                    historyProcesses.push({
+                        ...currentProcess,
+                        status: 'reanudado'
+                    });
+                }
+
+                historyProcesses.push({
+                    ...currentProcess,
+                    status: 'bloquear'
+                });
+            }
+            
             historyProcesses.push({
                 ...currentProcess,
                 status: 'despertar'
             });
-
-            processesByPriority[currentProcess.priority].push({...currentProcess});
+            
+            processQueue.push({...currentProcess});
             continue;
         }
         
@@ -190,7 +158,9 @@ $("#execute-process").addEventListener("click", () => {
             ...currentProcess,
             status: 'tiempo de expiración'
         });
-        processesByPriority[currentProcess.priority].push(currentProcess);
+        
+        // Add the unfinished process to the end of the queue
+        processQueue.push(currentProcess);
     }
 
     console.log(historyProcesses);
@@ -219,7 +189,6 @@ $("#search-process").addEventListener("click", () => {
 
     generateTableExecProcess(historyProcess)
 })
-
 $$(".filter-process").forEach(filter => {
     filter.addEventListener("click", () => {
         // Remove 'active' class from all filters
@@ -228,62 +197,64 @@ $$(".filter-process").forEach(filter => {
         filter.classList.add("active");
         const filterValue = filter.id;
         let historyProcessFilter = [];
+        
         switch (filterValue) {
             case "all":
                 historyProcessFilter = [...historyProcesses];
                 generateTableExecProcess(historyProcessFilter);
                 break;
-                case "ready":
-                    historyProcessFilter = historyProcesses.filter(process => process.status === 'listo');
-                    generateTableExecProcess(historyProcessFilter, ['pid', 'time', 'priority', 'block', 'suspend', 'reanudar', 'destruir']);
-                break;
             case "init":
-                historyProcessFilter = historyProcesses.filter(process => process.status === 'inicializado');
-                generateTableExecProcess(historyProcessFilter, ['pid', 'time', 'priority', 'block', 'suspend', 'reanudar', 'destruir']);
+                historyProcessFilter = historyProcesses.filter(process => process.status === 'nuevo');
+                generateTableExecProcess(historyProcessFilter);
+                break;
+            case "ready":
+                historyProcessFilter = historyProcesses.filter(process => process.status === 'listo');
+                generateTableExecProcess(historyProcessFilter);
                 break;
             case "despacho":
                 historyProcessFilter = historyProcesses.filter(process => process.status === 'despacho');
-                generateTableExecProcess(historyProcessFilter, ['pid', 'time', 'priority', 'block', 'suspend', 'reanudar', 'destruir']);
+                generateTableExecProcess(historyProcessFilter);
                 break;    
             case "running":
                 historyProcessFilter = historyProcesses.filter(process => process.status === 'ejecución');
-                generateTableExecProcess(historyProcessFilter, ['pid', 'time', 'priority', 'block', 'suspend', 'reanudar', 'destruir']);
+                generateTableExecProcess(historyProcessFilter);
                 break;
             case "time-exp":
                 historyProcessFilter = historyProcesses.filter(process => process.status === 'tiempo de expiración');
-                generateTableExecProcess(historyProcessFilter, ['pid', 'time', 'priority', 'block', 'suspend', 'reanudar', 'destruir']);
+                generateTableExecProcess(historyProcessFilter);
                 break;
             case "blocked":
                 historyProcessFilter = historyProcesses.filter(process => process.status === 'bloquear');
-                generateTableExecProcess(historyProcessFilter, ['pid', 'time', 'priority', 'suspend', 'reanudar', 'destruir']);
+                generateTableExecProcess(historyProcessFilter);
                 break;
             case "despertar":
                 historyProcessFilter = historyProcesses.filter(process => process.status === 'despertar');
-                generateTableExecProcess(historyProcessFilter, ['pid', 'time', 'priority', 'block', 'suspend', 'reanudar', 'destruir']);
+                generateTableExecProcess(historyProcessFilter);
                 break;
-            case "suspendido":
-                historyProcessFilter = historyProcesses.filter(process => process.status === 'suspendido');
-                generateTableExecProcess(historyProcessFilter, ['pid', 'time', 'priority', 'block', 'reanudar', 'destruir']);
+            case "wait-event":
+                historyProcessFilter = historyProcesses.filter(process => process.status === 'espera de evento')
+                generateTableExecProcess(historyProcessFilter);
                 break;
-            case "destruidos":
-                historyProcessFilter = historyProcesses.filter(process => process.status === 'destruido');
-                generateTableExecProcess(historyProcessFilter, ['pid', 'time', 'priority', 'block', 'suspend', 'reanudar']);
+            case "suspendido-listo":
+                historyProcessFilter = historyProcesses.filter(process => process.status === 'suspendido listo');
+                generateTableExecProcess(historyProcessFilter);
+                break;
+            case "suspendido-bloqueado":
+                historyProcessFilter = historyProcesses.filter(process => process.status === 'suspendido bloqueado');
+                generateTableExecProcess(historyProcessFilter);
                 break;
             case "finished":
                 historyProcessFilter = historyProcesses.filter(process => process.status === 'terminado');
-                generateTableExecProcess(historyProcessFilter, ['pid', 'priority', 'block', 'suspend', 'reanudar', 'destruir']);
+                generateTableExecProcess(historyProcessFilter);
                 break;
             case "reanudado":
                 historyProcessFilter = historyProcesses.filter(process => process.status === 'reanudado');
-                generateTableExecProcess(historyProcessFilter, ['pid', 'time', 'priority', 'block', 'suspend', 'destruir']);
-                break;
-            case "cambio-prioridad":
-                historyProcessFilter = historyProcesses.filter(process => process.status === 'cambio de prioridad');
-                generateTableExecProcess(historyProcessFilter, ['pid', 'time', 'priority', 'block', 'suspend', 'destruir']);
+                generateTableExecProcess(historyProcessFilter);
                 break;
             default:
                 console.log("ID no reconocido");
                 historyProcessFilter = [...historyProcesses];
+                generateTableExecProcess(historyProcessFilter);
         }
-    })
-})
+    });
+});
