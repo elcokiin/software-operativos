@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
-    <meta
-      http-equiv="X-Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'"
-    />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
+    <meta http-equiv="X-Content-Security-Policy" content="default-src 'self'; script-src 'self'" />
     <link rel="stylesheet" href="style.css">
     <title>Software3</title>
-  </head>
-  <body>
+</head>
+
+<body>
     <header class="header">
         <h1>SOFTWARE 3</h1>
         <ul>
@@ -30,23 +26,11 @@
                 </div>
                 <label class="form-label-process" for="pid">
                     Nombre del proceso:
-                    <input 
-                        type="text" 
-                        id="pid" 
-                        name="pid" 
-                        class="input name-process" 
-                        required
-                    >
+                    <input type="text" id="pid" name="pid" class="input name-process" required>
                 </label>
                 <label class="form-label-process" for="time">
                     Tiempo de ejecución:
-                    <input 
-                        type="number" 
-                        id="time" 
-                        name="time" 
-                        class="input time-process" 
-                        required
-                    >
+                    <input type="number" id="time" name="time" class="input time-process" required>
                 </label>
 
                 <div class="checkbox-processes">
@@ -57,7 +41,7 @@
                             <option value="yes">Sí</option>
                         </select>
                     </label>
-    
+
                     <label class="form-label-process" for="suspend-process">
                         ¿Suspendido Listo?
                         <select id="ready-suspend" name="ready-suspend" class="input suspend-process" required>
@@ -65,7 +49,7 @@
                             <option value="yes">Sí</option>
                         </select>
                     </label>
-                    
+
                     <label class="form-label-process" for="suspend-process">
                         ¿Suspendido Bloqueado?
                         <select id="block-suspend" name="block-suspend" class="input suspend-process" required>
@@ -82,29 +66,29 @@
                         </select>
                     </label>
                 </div>
-                
+
                 <button type="button" id="add-process" class="button-submit">Agregar proceso</button>
             </form>
             <!-- tabla -->
             <div class="tabla-registers-process">
                 <h2>Tabla de procesos registrados</h2>
                 <div class="table-container">
-                <div class="grid-table">
-                    <div class="grid-header">
-                        <div class="grid-cell header-cell">Proceso</div>
-                        <div class="grid-cell header-cell">Tiempo ejecución</div>
-                        <div class="grid-cell header-cell">Bloqueado</div>
-                        <div class="grid-cell header-cell">Suspendido Listo</div>
-                        <div class="grid-cell header-cell">Suspendido Bloqueado</div>
-                        <div class="grid-cell header-cell">Reanudado</div>
-                        <div class="grid-cell header-cell">Acciones</div>
-                    </div>
-                    <div class="grid-body">
+                    <div class="grid-table">
+                        <div class="grid-header">
+                            <div class="grid-cell header-cell">Proceso</div>
+                            <div class="grid-cell header-cell">Tiempo ejecución</div>
+                            <div class="grid-cell header-cell">Bloqueado</div>
+                            <div class="grid-cell header-cell">Suspendido Listo</div>
+                            <div class="grid-cell header-cell">Suspendido Bloqueado</div>
+                            <div class="grid-cell header-cell">Reanudado</div>
+                            <div class="grid-cell header-cell">Acciones</div>
+                        </div>
+                        <div class="grid-body">
+                        </div>
                     </div>
                 </div>
             </div>
-            </div>
-            
+
         </section>
         <div class="execute-process">
             <button class="button-submit success-button" id="execute-process">
@@ -115,13 +99,8 @@
             <!-- buscador y filtro -->
             <div class="search-process">
                 <div class="search-container">
-                    <input 
-                        type="text" 
-                        id="search-pid" 
-                        name="search" 
-                        class="input search-process" 
-                        placeholder="Ingrese nombre del proceso"
-                    >
+                    <input type="text" id="search-pid" name="search" class="input search-process"
+                        placeholder="Ingrese nombre del proceso">
                     <button type="button" id="search-process" class="button-submit">Buscar</button>
                 </div>
 
@@ -152,12 +131,16 @@
                     <li class="filter-process" id="blocked">
                         Bloqueados
                     </li>
-                    <li class="filter-process" id="despertar">
+                    <li class="filter-process" id="terminacion operacion">
                         Terminación de operación
                     </li>
 
                     <li class="filter-process" id="wait-event">
                         Espera de evento
+                    </li>
+
+                    <li class="filter-process" id="suspendidos">
+                        Suspendidos
                     </li>
 
                     <li class="filter-process" id="suspendido-listo">
@@ -171,7 +154,7 @@
                     <li class="filter-process" id="reanudado">
                         Reanudados
                     </li>
-                    
+
                     <li class="filter-process" id="finished">
                         Salida
                     </li>
@@ -209,7 +192,8 @@
     <div class="container-button-close">
         <button id="closeApp" class="close-button">Cerrar programa</button>
     </div>
-    
+
     <script src="src/index.js" type="module"></script>
-  </body>
+</body>
+
 </html>

@@ -34,14 +34,14 @@ $("#add-process").addEventListener("click", () => {
     }
 })
 $("#execute-process").addEventListener("click", () => {
-    
-    if(listOfProcesses.length === 0) {
+
+    if (listOfProcesses.length === 0) {
         window.electronAPI.showErrorDialog("No hay procesos registrados para ejecutar la simulación.")
         return;
     }
-    
+
     resetHistory()
-    
+
     listOfProcesses.forEach(process => {
         historyProcesses.push({
             ...process,
@@ -50,39 +50,39 @@ $("#execute-process").addEventListener("click", () => {
     })
 
     // Create a queue with copies of all processes
-    const processQueue = listOfProcesses.map(process => ({...process}));
-    
+    const processQueue = listOfProcesses.map(process => ({ ...process }));
+
     // Clear original list since we have copies
     resetListProcess();
-    
+
     const EXECTIME = 5;
-    
+
     // Continue processing until all processes are done
     while (processQueue.length > 0) {
         // Get the next process from the queue
         const process = processQueue.shift();
-        
+
         // Store process states in history
         historyProcesses.push({
             ...process,
             status: 'listo'
         });
-        
+
         historyProcesses.push({
             ...process,
             status: 'despacho'
         });
-        
+
         historyProcesses.push({
             ...process,
             status: 'ejecución'
         });
-        
+
         // Process execution - reduce time
-        const updatedProcess = {...process, time: parseInt(process.time) - EXECTIME};
-        
+        const updatedProcess = { ...process, time: parseInt(process.time) - EXECTIME };
+
         // Check if process is finished
-        if(updatedProcess.time <= 0) {
+        if (updatedProcess.time <= 0) {
             updatedProcess.time = 0;
             historyProcesses.push({
                 ...updatedProcess,
@@ -91,28 +91,34 @@ $("#execute-process").addEventListener("click", () => {
             continue;
         }
 
-        let currentProcess = {...updatedProcess};
-        
+        let currentProcess = { ...updatedProcess };
+
         // Handle ready suspend
-        if(currentProcess.readySuspend === 'yes') {
+        if (currentProcess.readySuspend === 'yes') {
+
+            historyProcesses.push({
+                ...currentProcess,
+                status: 'suspendido'
+            });
+
             historyProcesses.push({
                 ...currentProcess,
                 status: 'suspendido listo'
             });
-            
+
             // If marked to resume
-            if(currentProcess.reanudar === 'yes') {
+            if (currentProcess.reanudar === 'yes') {
                 historyProcesses.push({
                     ...currentProcess,
                     status: 'reanudado'
                 });
             }
-            processQueue.push({...currentProcess});
+            processQueue.push({ ...currentProcess });
             continue;
         }
-        
+
         // Handle block
-        if(currentProcess.block === 'yes') {
+        if (currentProcess.block === 'yes') {
 
             historyProcesses.push({
                 ...currentProcess,
@@ -123,16 +129,22 @@ $("#execute-process").addEventListener("click", () => {
                 ...currentProcess,
                 status: 'bloquear'
             });
-            
+
             // Handle block suspend
-            if(currentProcess.blockSuspend === 'yes') {
+            if (currentProcess.blockSuspend === 'yes') {
+
+                historyProcesses.push({
+                    ...currentProcess,
+                    status: 'suspendido'
+                });
+
                 historyProcesses.push({
                     ...currentProcess,
                     status: 'suspendido bloqueado'
                 });
-                
+
                 // If marked to resume
-                if(currentProcess.reanudar === 'yes') {
+                if (currentProcess.reanudar === 'yes') {
                     historyProcesses.push({
                         ...currentProcess,
                         status: 'reanudado'
@@ -144,27 +156,27 @@ $("#execute-process").addEventListener("click", () => {
                     status: 'bloquear'
                 });
             }
-            
+
             historyProcesses.push({
                 ...currentProcess,
-                status: 'despertar'
+                status: 'terminacion operacion'
             });
-            
-            processQueue.push({...currentProcess});
+
+            processQueue.push({ ...currentProcess });
             continue;
         }
-        
+
         historyProcesses.push({
             ...currentProcess,
             status: 'tiempo de expiración'
         });
-        
+
         // Add the unfinished process to the end of the queue
         processQueue.push(currentProcess);
     }
 
     console.log(historyProcesses);
-    
+
     // Update the UI
     $$(".filter-process").forEach(f => f.classList.remove("active"));
     $("#all").classList.add("active");
@@ -184,7 +196,7 @@ $("#search-process").addEventListener("click", () => {
 
     if (historyProcess.length === 0) {
         window.electronAPI.showErrorDialog(`Proceso ${pid} no encontrado`)
-        return  
+        return
     }
 
     generateTableExecProcess(historyProcess)
@@ -197,7 +209,7 @@ $$(".filter-process").forEach(filter => {
         filter.classList.add("active");
         const filterValue = filter.id;
         let historyProcessFilter = [];
-        
+
         switch (filterValue) {
             case "all":
                 historyProcessFilter = [...historyProcesses];
@@ -214,7 +226,7 @@ $$(".filter-process").forEach(filter => {
             case "despacho":
                 historyProcessFilter = historyProcesses.filter(process => process.status === 'despacho');
                 generateTableExecProcess(historyProcessFilter);
-                break;    
+                break;
             case "running":
                 historyProcessFilter = historyProcesses.filter(process => process.status === 'ejecución');
                 generateTableExecProcess(historyProcessFilter);
@@ -227,12 +239,16 @@ $$(".filter-process").forEach(filter => {
                 historyProcessFilter = historyProcesses.filter(process => process.status === 'bloquear');
                 generateTableExecProcess(historyProcessFilter);
                 break;
-            case "despertar":
-                historyProcessFilter = historyProcesses.filter(process => process.status === 'despertar');
+            case "terminacion operacion":
+                historyProcessFilter = historyProcesses.filter(process => process.status === 'terminacion operacion');
                 generateTableExecProcess(historyProcessFilter);
                 break;
             case "wait-event":
                 historyProcessFilter = historyProcesses.filter(process => process.status === 'espera de evento')
+                generateTableExecProcess(historyProcessFilter);
+                break;
+            case "suspendidos":
+                historyProcessFilter = historyProcesses.filter(process => process.status === 'suspendido');
                 generateTableExecProcess(historyProcessFilter);
                 break;
             case "suspendido-listo":

@@ -54,7 +54,7 @@ export const addProcess = ({ pid, time, block, readySuspend, blockSuspend, reanu
     let pidExists = false;
     listOfProcesses.forEach(process => {
         if(process.pid === pid) {
-            window.electronAPI.showErrorDialog('Ya existe un proceso con ese mismo nombre de proceso');
+            window.electronAPI.showErrorDialog('Ya existe un proceso con el mismo nombre.');
             pidExists = true;
             return 0;
         }
