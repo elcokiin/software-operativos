@@ -31,10 +31,10 @@ export const addProcess = ({ pid, time, block, readySuspend, blockSuspend, reanu
         return 0;
     }
 
-    if (block === "yes" && readySuspend === "yes") {
-        window.electronAPI.showErrorDialog("Error el proceso no puede estar bloqueado y suspendido listo.")
-        return 0;
-    }
+    // if (block === "yes" && readySuspend === "yes") {
+    //     window.electronAPI.showErrorDialog("Error el proceso no puede estar bloqueado y suspendido listo.")
+    //     return 0;
+    // }
 
     if (reanudar === "yes" && (readySuspend === "no" && blockSuspend === "no")) {
         window.electronAPI.showErrorDialog("Error el proceso no puede reanudarse si no esta suspendido.")

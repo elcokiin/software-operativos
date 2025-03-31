@@ -44,7 +44,7 @@ body {
     border-radius: 4px;
     cursor: pointer;
     transition: ease-in-out 255ms;
-    border: #c5c5c5 1px solid;   
+    border: #c5c5c5 1px solid;
 }
 
 .header ul li:hover {
@@ -186,7 +186,7 @@ body {
     border-radius: 4px;
     cursor: pointer;
     transition: ease-in-out 255ms;
-    border: #c5c5c5 1px solid;   
+    border: #c5c5c5 1px solid;
 }
 
 .filter-process:hover {
@@ -233,6 +233,7 @@ body {
     align-items: center;
     gap: 8px;
 }
+
 /* Estilos para la tabla con elementos HTML de tabla */
 .grid-process-table {
     display: grid;
@@ -240,10 +241,10 @@ body {
     border: 1px solid #ddd;
     border-radius: 4px;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.grid-process-table thead, 
+.grid-process-table thead,
 .grid-process-table tbody {
     display: grid;
     width: 100%;
@@ -251,7 +252,8 @@ body {
 
 .grid-process-table tr {
     display: grid;
-    grid-template-columns: repeat(7, 1fr); /* Using 1fr for equal column distribution */
+    grid-template-columns: repeat(7, 1fr);
+    /* Using 1fr for equal column distribution */
     width: 100%;
 }
 
@@ -277,7 +279,7 @@ body {
     background-color: #e8e8e8;
 }
 
-.grid-process-table th, 
+.grid-process-table th,
 .grid-process-table td {
     padding: 12px 15px;
     text-align: center;
@@ -295,12 +297,14 @@ body {
     border: 1px solid #ddd;
     border-radius: 4px;
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.grid-header, .grid-row {
+.grid-header,
+.grid-row {
     display: grid;
-    grid-template-columns: repeat(7, 1fr); /* Consistent grid columns */
+    grid-template-columns: repeat(7, 1fr);
+    /* Consistent grid columns */
     width: 100%;
 }
 
@@ -425,4 +429,36 @@ body {
 
 .close-button:hover {
     opacity: 0.9;
+}
+
+.zoom-controls {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.zoom-button {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    background-color: #f0f0f0;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.zoom-button:hover {
+    background-color: #e0e0e0;
+}
+
+#zoomLevel {
+    min-width: 50px;
+    text-align: center;
+    font-weight: bold;
 }

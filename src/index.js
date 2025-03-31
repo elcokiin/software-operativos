@@ -68,6 +68,31 @@ $("#execute-process").addEventListener("click", () => {
             status: 'listo'
         });
 
+        if (process.readySuspend === 'yes') {
+            historyProcesses.push({
+                ...process,
+                status: 'suspendido'
+            });
+
+            historyProcesses.push({
+                ...process,
+                status: 'suspendido listo'
+            });
+
+            // If marked to resume
+            if (process.reanudar === 'yes') {
+                historyProcesses.push({
+                    ...process,
+                    status: 'reanudado'
+                });
+            }
+
+            historyProcesses.push({
+                ...process,
+                status: "listo"
+            })
+        }
+
         historyProcesses.push({
             ...process,
             status: 'despacho'
@@ -83,6 +108,21 @@ $("#execute-process").addEventListener("click", () => {
 
         // Check if process is finished
         if (updatedProcess.time <= 0) {
+
+            // If process is marked to block
+            if (updatedProcess.block === 'yes') {
+
+                historyProcesses.push({
+                    ...updatedProcess,
+                    status: "espera de evento",
+                })
+
+                historyProcesses.push({
+                    ...updatedProcess,
+                    status: 'bloquear'
+                });
+            }
+
             updatedProcess.time = 0;
             historyProcesses.push({
                 ...updatedProcess,
@@ -93,31 +133,7 @@ $("#execute-process").addEventListener("click", () => {
 
         let currentProcess = { ...updatedProcess };
 
-        // Handle ready suspend
-        if (currentProcess.readySuspend === 'yes') {
-
-            historyProcesses.push({
-                ...currentProcess,
-                status: 'suspendido'
-            });
-
-            historyProcesses.push({
-                ...currentProcess,
-                status: 'suspendido listo'
-            });
-
-            // If marked to resume
-            if (currentProcess.reanudar === 'yes') {
-                historyProcesses.push({
-                    ...currentProcess,
-                    status: 'reanudado'
-                });
-            }
-            processQueue.push({ ...currentProcess });
-            continue;
-        }
-
-        // Handle block
+        // Check if process is marked to block
         if (currentProcess.block === 'yes') {
 
             historyProcesses.push({
@@ -143,6 +159,18 @@ $("#execute-process").addEventListener("click", () => {
                     status: 'suspendido bloqueado'
                 });
 
+                if (currentProcess.readySuspend === 'yes') {
+                    historyProcesses.push({
+                        ...currentProcess,
+                        status: "suspendido listo",
+                    })
+                } else {
+                    historyProcesses.push({
+                        ...currentProcess,
+                        status: "bloquear",
+                    })
+                }
+
                 // If marked to resume
                 if (currentProcess.reanudar === 'yes') {
                     historyProcesses.push({
@@ -151,10 +179,6 @@ $("#execute-process").addEventListener("click", () => {
                     });
                 }
 
-                historyProcesses.push({
-                    ...currentProcess,
-                    status: 'bloquear'
-                });
             }
 
             historyProcesses.push({
@@ -162,7 +186,27 @@ $("#execute-process").addEventListener("click", () => {
                 status: 'terminacion operacion'
             });
 
-            processQueue.push({ ...currentProcess });
+            processQueue.push(currentProcess);
+            continue;
+        } else if (currentProcess.readySuspend === "yes") {
+            historyProcesses.push({
+                ...currentProcess,
+                status: "suspendido"
+            })
+
+            historyProcesses.push({
+                ...currentProcess,
+                status: "suspendido listo"
+            })
+
+            if (currentProcess.reanudar === "yes") {
+                historyProcesses.push({
+                    ...currentProcess,
+                    status: 'reanudado'
+                });
+            }
+
+            processQueue.push(currentProcess);
             continue;
         }
 

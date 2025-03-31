@@ -1,65 +1,101 @@
-1/user-manual.html -->
+/user-manual.html -->
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <meta
-            http-equiv="Content-Security-Policy"
-            content="default-src 'self'; script-src 'self' 'nonce-abc123';"
-        />
-        <title>Electron PDF.js Desktop PDF Viewer Example</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-            <div id="pdfContainer"></div>
 
-        <div class="container-button-close">
-            <button id="closeManual" class="close-button">Cerrar Manual de Usuario</button>
-        </div>
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'nonce-abc123';" />
+    <title>Electron PDF.js Desktop PDF Viewer Example</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-        <script type="module" src="./src/user-manual.js"></script>
-        <!-- Import PDF.js as a module -->
-        <script type="module" nonce="abc123">
-            import * as pdfjsLib from './pdf.min.mjs';
+<body>
+    <div id="pdfContainer"></div>
 
-            // Set the workerSrc to point to the PDF.js worker script
-            pdfjsLib.GlobalWorkerOptions.workerSrc =
-                './pdf.worker.min.mjs';
+    <div class="zoom-controls">
+        <button id="zoomIn" class="zoom-button">Zoom In (+)</button>
+        <button id="zoomOut" class="zoom-button">Zoom Out (-)</button>
+        <span id="zoomLevel">150%</span>
+    </div>
 
-            async function renderPdf(pdfDocument) {
-                try {
-                    const pdf = await pdfjsLib.getDocument(pdfDocument).promise;
-                    const totalPages = pdf.numPages;
-                    const container = document.getElementById('pdfContainer');
-                    
-                    // Render all pages
-                    for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
-                        const page = await pdf.getPage(pageNumber);
-                        const scale = 1.5;
-                        const viewport = page.getViewport({ scale });
-                        
-                        // Create a canvas for each page
-                        const canvas = document.createElement('canvas');
-                        canvas.className = 'pdf-page';
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
-                        container.appendChild(canvas);
-                        
-                        const context = canvas.getContext('2d');
-                        const renderContext = {
-                            canvasContext: context,
-                            viewport,
-                        };
-                        
-                        await page.render(renderContext).promise;
-                    }
-                } catch (error) {
-                    console.error(error);
+    <div class="container-button-close">
+        <button id="closeManual" class="close-button">Cerrar Manual de Usuario</button>
+    </div>
+
+    <script type="module" src="./src/user-manual.js"></script>
+    <!-- Import PDF.js as a module -->
+    <script type="module" nonce="abc123">
+        import * as pdfjsLib from './pdf.min.mjs';
+
+        // Set the workerSrc to point to the PDF.js worker script
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            './pdf.worker.min.mjs';
+
+        let currentScale = 1.5;
+        let pdfDocument = null;
+
+        async function renderPdf(pdfPath, scale) {
+            try {
+                // Clear previous content
+                const container = document.getElementById('pdfContainer');
+                container.innerHTML = '';
+
+                // If we already have the PDF document, use it
+                if (!pdfDocument) {
+                    pdfDocument = await pdfjsLib.getDocument(pdfPath).promise;
                 }
-            }
 
-            const pdfPath = './manual-de-usuario-software-1.pdf'; // Path to your PDF file
-            renderPdf(pdfPath);
-        </script>
-    </body>
+                const totalPages = pdfDocument.numPages;
+
+                // Update zoom level display
+                document.getElementById('zoomLevel').textContent = `${Math.round(scale * 100)}%`;
+
+                // Render all pages
+                for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+                    const page = await pdfDocument.getPage(pageNumber);
+                    const viewport = page.getViewport({ scale });
+
+                    // Create a canvas for each page
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'pdf-page';
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+                    container.appendChild(canvas);
+
+                    const context = canvas.getContext('2d');
+                    const renderContext = {
+                        canvasContext: context,
+                        viewport,
+                    };
+
+                    await page.render(renderContext).promise;
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        // Function to zoom in
+        function zoomIn() {
+            currentScale += 0.25;
+            renderPdf('./manual-de-usuario-software-1.pdf', currentScale);
+        }
+
+        // Function to zoom out
+        function zoomOut() {
+            if (currentScale > 0.5) {
+                currentScale -= 0.25;
+                renderPdf('./manual-de-usuario-software-1.pdf', currentScale);
+            }
+        }
+
+        // Add event listeners to zoom buttons
+        document.getElementById('zoomIn').addEventListener('click', zoomIn);
+        document.getElementById('zoomOut').addEventListener('click', zoomOut);
+
+        const pdfPath = './manual-de-usuario-software-1.pdf'; // Path to your PDF file
+        renderPdf(pdfPath, currentScale);
+    </script>
+</body>
+
 </html>
